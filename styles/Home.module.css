@@ -21,21 +21,22 @@
   align-items: center;
 }
 
-.footer a {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-grow: 1;
+.footer span {
+  font-weight: bold;
 }
 
-.title a {
+.title span {
+  color: #0070f3;
+}
+
+.description a {
   color: #0070f3;
   text-decoration: none;
 }
 
-.title a:hover,
-.title a:focus,
-.title a:active {
+.description a:hover,
+.description a:focus,
+.description a:active {
   text-decoration: underline;
 }
 
@@ -56,21 +57,15 @@
   font-size: 1.5rem;
 }
 
-.code {
-  background: #fafafa;
-  border-radius: 5px;
-  padding: 0.75rem;
-  font-size: 1.1rem;
-  font-family: Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono,
-    Bitstream Vera Sans Mono, Courier New, monospace;
-}
-
 .grid {
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-wrap: wrap;
   max-width: 800px;
+}
+
+.spacer {
+  padding: 2rem 0;
 }
 
 .card {
@@ -103,9 +98,37 @@
   line-height: 1.5;
 }
 
-.logo {
-  height: 1em;
-  margin-left: 0.5rem;
+.games {
+  list-style-type: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+}
+
+.game {
+  margin: 1rem;
+  padding: 1rem;
+  width: 100%;
+  border: 1px solid black;
+}
+
+.game * {
+  display: inline;
+  margin: 1rem;
+}
+
+.game a {
+  border: 1px solid white;
+  border-radius: 0.2rem;
+  padding: 0.4rem;
+}
+
+.game a:hover,
+.game a:focus,
+.game a:active {
+  color: #0070f3;
+  border-color: #0070f3;
 }
 
 @media (max-width: 600px) {
