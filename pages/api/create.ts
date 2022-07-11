@@ -41,7 +41,7 @@ async function createGame(id: string, creatorID: string) {
   const game: Game = {
     id: id,
     creator: { id: creatorID, points: 0, team: Team.CREATOR },
-    status: Status.PENDING,
+    status: Status.WAITING,
     moves: [],
   };
   await addGame(game);

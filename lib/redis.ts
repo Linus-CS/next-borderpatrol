@@ -1,6 +1,10 @@
 import { createClient } from "redis";
 
-const client = createClient();
+const client = createClient({
+  url: 'redis://containers-us-west-56.railway.app:6435',
+  password: '4OhPIaNlypnApiJdNm2E',
+  username: 'default'
+});
 
 client.on("error", (err) => {
   console.log("Redis Error: ", err);

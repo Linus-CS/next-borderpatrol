@@ -31,13 +31,17 @@ export default async function handler(
   let player: Player | null = null;
   if (cookies.get(`game${id}_uuid`) == game.creator.id) player = game.creator;
   else if (cookies.get(`game${id}_uuid_join`) == game.challenger?.id)
-    player = game.challenger!!;
+    player = game.challenger!;
   if (player === null)
     return res.json({
       msg: "What are you doing?",
       state: undefined,
       team: undefined,
     });
-  console.log(player);
+
+  const data = req.body != '' ? JSON.parse(req.body) : null;
+  console.log(data);
+
   res.json({ msg: "Great!", state: Status.RUNNING, team: player.team });
+
 }

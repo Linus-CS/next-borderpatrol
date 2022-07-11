@@ -9,6 +9,11 @@ function Line(props: any) {
     if (state === 0) {
       setState(1);
       setColor(props.color);
+      fetch(`/api/game/${props.pid}`, { method: 'POST', body: JSON.stringify({ row: props.row, column: props.column, orientation: props.orientation }) })
+        .then((res) => res.json())
+        .then((data) => {
+
+        });
     }
   }
 

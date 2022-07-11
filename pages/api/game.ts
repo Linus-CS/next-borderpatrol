@@ -12,8 +12,9 @@ export const config = {
 
 export enum Status {
   ERROR = 0,
-  PENDING = 1,
+  WAITING = 1,
   RUNNING = 2,
+  PENDING = 3,
 }
 
 export interface Game {
@@ -30,9 +31,16 @@ export interface Player {
   team: Team;
 }
 
-interface Move {}
+interface Move {
+  id: number;
+  row: number;
+  column: number;
+}
 
-interface Action {}
+interface Box {
+  row: number;
+  column: number;
+}
 
 type ListResponse = {
   games: string[];

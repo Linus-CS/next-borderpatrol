@@ -20,7 +20,7 @@ export default async function handler(
   const game: Game | null = await findGame(id as string);
   if (!game) {
     res.json({ msg: "Game does not exist." });
-  } else if (game.status == Status.PENDING) {
+  } else if (game.status == Status.WAITING) {
     const uuid = randomUUID();
     await joinGame(game, uuid);
     cookies.set(`game${id}_uuid_join`, uuid);
