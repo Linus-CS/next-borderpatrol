@@ -2,7 +2,7 @@ import Cookies from "cookies";
 import { randomUUID } from "crypto";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getAsync, setAsync } from "../../lib/redis";
-import { addGame, Game, Status } from "./game";
+import { addGame, Board, Game, Status } from "./game";
 import { Team } from "./game/[id]";
 
 export const config = {
@@ -42,7 +42,7 @@ async function createGame(id: string, creatorID: string) {
     id: id,
     creator: { id: creatorID, points: 0, team: Team.CREATOR },
     status: Status.WAITING,
-    moves: [],
+    board: new Board(),
   };
   await addGame(game);
 }

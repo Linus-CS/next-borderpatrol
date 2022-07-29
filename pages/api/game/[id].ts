@@ -1,47 +1,73 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import Cookies from "cookies";
-import { findGame, Game, Player, Status } from "../game";
+import { Board, findGame, Game, Player, replaceGame, Status } from "../game";
+import { IncomingMessage, ServerResponse } from "http";
 
 export enum Team {
   CREATOR = 1,
   CHALLENGER = 2,
 }
 
-type ResponseData = {
+export type RegularRespone = {
   msg: string;
-  state: Status | undefined;
-  team: Team | undefined;
+  status: Status;
+  team: Team;
+  board: Board;
+};
+
+type IrregularRespone = {
+  msg: string;
 };
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<ResponseData>
+  res: NextApiResponse<RegularRespone | IrregularRespone>
 ) {
   // Init vars
-  const { id } = req.query;
-  const cookies = new Cookies(req, res);
-  const game: Game | null = await findGame(id as string);
-  if (!game)
+  const id = req.query["id"] as string;
+  const game: Game | null = await findGame(id);
+  if (game === null)
     return res.json({
       msg: "This game does not exist!",
-      state: undefined,
-      team: undefined,
     });
 
-  let player: Player | null = null;
-  if (cookies.get(`game${id}_uuid`) == game.creator.id) player = game.creator;
-  else if (cookies.get(`game${id}_uuid_join`) == game.challenger?.id)
-    player = game.challenger!;
+  let player: Player | null = determinePlayer(req, res, game, id);
   if (player === null)
     return res.json({
       msg: "What are you doing?",
-      state: undefined,
-      team: undefined,
     });
 
-  const data = req.body != '' ? JSON.parse(req.body) : null;
+  const data = req.body != "" ? JSON.parse(req.body) : null;
+  if (data) await handleData(data, game, player);
+
+  res.json({
+    msg: "Great!",
+    status: Status.RUNNING,
+    team: player.team,
+    board: game.board,
+  });
+}
+
+async function handleData(
+  data: { row: number; column: number; orientation: any },
+  game: Game,
+  player: Player
+) {
   console.log(data);
+  game.board.lines[`${data.row * 10 + data.column},${data.orientation}`] =
+    player.team;
+  await replaceGame(game);
+}
 
-  res.json({ msg: "Great!", state: Status.RUNNING, team: player.team });
-
+function determinePlayer(
+  req: IncomingMessage,
+  res: ServerResponse,
+  game: Game,
+  id: string
+) {
+  const cookies = new Cookies(req, res);
+  if (cookies.get(`game${id}_uuid`) === game.creator.id) return game.creator;
+  else if (cookies.get(`game${id}_uuid_join`) === game.challenger?.id)
+    return game.challenger!;
+  return null;
 }

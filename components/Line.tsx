@@ -2,18 +2,25 @@ import { useState } from "react";
 import styles from "../styles/Home.module.css";
 
 function Line(props: any) {
-  const [state, setState] = useState(0);
-  const [color, setColor] = useState("rgba(156, 156, 156, 0.473)");
+  if (props.row > 9 || props.column > 9) return <></>;
+  const [state, setState] = useState(props.state);
+  const [color, setColor] = useState(
+    state === 0
+      ? "rgba(156, 156, 156, 0.473)"
+      : props.state === 1
+      ? "rgba(16, 113, 210, 0.605)"
+      : "rgba(210, 16, 16, 0.605)"
+  );
 
   function click() {
     if (state === 0) {
-      setState(1);
-      setColor(props.color);
-      fetch(`/api/game/${props.pid}`, { method: 'POST', body: JSON.stringify({ row: props.row, column: props.column, orientation: props.orientation }) })
-        .then((res) => res.json())
-        .then((data) => {
-
-        });
+      setState(props.team);
+      setColor(
+        props.team === 1
+          ? "rgba(16, 113, 210, 0.605)"
+          : "rgba(210, 16, 16, 0.605)"
+      );
+      props.onClick();
     }
   }
 

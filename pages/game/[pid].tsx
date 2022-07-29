@@ -2,31 +2,87 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { Circles } from "react-loader-spinner";
 import Box from "../../components/Box";
+import Line from "../../components/Line";
 import styles from "../../styles/Home.module.css";
+import { RegularRespone } from "../api/game/[id]";
 
 const Game: NextPage = (props: any) => {
   const router = useRouter();
   const { pid } = router.query;
-  const [gameState, setGameState] = useState({ msg: '', state: 0, team: 0 });
+  const [gameState, setGameState] = useState<RegularRespone | null>(null);
+  const [grid, setGrid] = useState<any[]>([]);
+
+  console.log(gameState);
 
   useEffect(() => {
     if (pid)
       fetch(`/api/game/${pid}`)
         .then((res) => res.json())
         .then((data) => {
-          setGameState(data);
+          if ("status" in data) setGameState(data);
         });
   }, [pid]);
 
-  const grid = [];
-  let row = 0;
-  let column = -1;
-  for (let i = 0; i < 100; i++) {
-    row = i % 10;
-    if (row == 0) column++;
-    grid.push(<Box key={i} pid={pid} row={row} column={column} team={gameState.team} />);
-  }
+  useEffect(() => {
+    if (gameState) {
+      const components = [];
+
+      const onLineClick = (
+        row: number,
+        column: number,
+        orientation: number
+      ) => {
+        fetch(`/api/game/${pid}`, {
+          method: "POST",
+          body: JSON.stringify({
+            row: row,
+            column: column,
+            orientation: orientation,
+          }),
+        })
+          .then((res) => res.json())
+          .then((data) => setGameState(data));
+      };
+
+      for (let row = 0; row < 10; row++) {
+        for (let column = 0; column < 10; column++) {
+          const key = row * 10 + column;
+          components.push(
+            <Box key={key}>
+              <Line
+                key={`${key},1`}
+                row={row}
+                column={column}
+                orientation={1}
+                state={gameState.board.lines[`${key},1`]}
+                team={gameState.team}
+                onClick={() => onLineClick(row, column, 1)}
+              />
+              <Line
+                key={`${key},0`}
+                row={row}
+                column={column}
+                orientation={0}
+                state={gameState.board.lines[`${key},0`]}
+                team={gameState.team}
+                onClick={() => onLineClick(row, column, 0)}
+              />
+            </Box>
+          );
+        }
+      }
+      setGrid(components);
+    }
+  }, [gameState]);
+
+  if (grid.length == 0)
+    return (
+      <div className={styles.main}>
+        <Circles color="#0070f3" height={80} width={80} />
+      </div>
+    );
 
   return (
     <div className={styles.container}>
@@ -38,7 +94,7 @@ const Game: NextPage = (props: any) => {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className={styles.main} >
+      <div className={styles.main}>
         <h1 className={styles.header}>
           <span>Border</span> Patrol
         </h1>

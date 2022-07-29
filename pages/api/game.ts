@@ -22,24 +22,27 @@ export interface Game {
   creator: Player;
   challenger?: Player;
   status: Status;
-  moves: Move[];
+  board: Board;
+}
+
+export class Board {
+  lines: any;
+  constructor() {
+    const l = new Map<String, number>;
+    for (let r = 0; r < 10; r++) {
+      for (let c = 0; c < 10; c++) {
+        l.set(`${r * 10 + c},0`, 0);
+        l.set(`${r * 10 + c},1`, 0);
+      }
+    }
+    this.lines = Object.fromEntries(l);
+  }
 }
 
 export interface Player {
   id: string;
   points: number;
   team: Team;
-}
-
-interface Move {
-  id: number;
-  row: number;
-  column: number;
-}
-
-interface Box {
-  row: number;
-  column: number;
 }
 
 type ListResponse = {
