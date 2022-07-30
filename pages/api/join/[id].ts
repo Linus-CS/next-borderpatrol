@@ -33,8 +33,9 @@ export default async function handler(
 }
 
 async function joinGame(game: Game, challengerID: string) {
-  game.challenger = { id: challengerID, points: 0, team: Team.CHALLENGER, status: Status.PENDING };
+  game.challenger = { id: challengerID, points: 0, team: Team.CHALLENGER, status: Status.PENDING, update: true };
   game.creator.status = Status.TURN;
+  game.creator.update = true;
   const games = await getAsync("games");
   const index = games.indexOf(game.id);
   if (index !== -1) games.splice(index, 1);

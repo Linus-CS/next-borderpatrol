@@ -1,99 +1,96 @@
 import type { NextPage } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Circles } from "react-loader-spinner";
 import Box from "../../components/Box";
 import Line from "../../components/Line";
 import styles from "../../styles/Home.module.css";
 import { RegularRespone } from "../api/game/[id]";
 
+const msgMappings = [
+  "Something went wrong",
+  "Your Turn",
+  "Waiting for opponent to join",
+  "Waiting for opponent to make a move",
+];
+
 const Game: NextPage = (props: any) => {
   const router = useRouter();
   const { pid } = router.query;
   const [gameState, setGameState] = useState<RegularRespone | null>(null);
-  const [grid, setGrid] = useState<any[]>([]);
+  let [check, setCheck] = useState(0);
 
-  function requestGameState() {
-    fetch(`/api/game/${pid}`)
+  function requestGameState(data?: any) {
+    fetch(`/api/game/${pid}`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    })
       .then((res) => res.json())
       .then((data) => {
-        if ("status" in data && JSON.stringify(data) !== JSON.stringify(gameState)) {
+        console.log(data.msg);
+        if ("status" in data) {
           setGameState(data);
-          console.log(gameState);
         }
       });
   }
 
   useEffect(() => {
-    if (pid) requestGameState();
-  }, [pid])
-
-  useEffect(() => {
+    if (pid && gameState === null) {
+      requestGameState({ msg: "retrieve" });
+    }
     const timer = setInterval(() => {
-      if (pid && (gameState?.status === 2 || gameState?.status === 3)) {
-        requestGameState();
+      if (gameState?.status === 2 || gameState?.status === 3) {
+        requestGameState({ msg: "ping" });
       }
+      setCheck(check + 1);
     }, 1000);
 
     // clearing interval when component unmounts
     return () => clearInterval(timer);
-  }, []);
+  }, [check]);
 
+  let grid = [];
+  if (gameState) {
+    const onLineClick = (row: number, column: number, orientation: number) => {
+      requestGameState({
+        msg: "set",
+        row: row,
+        column: column,
+        orientation: orientation,
+      });
+    };
 
-  useEffect(() => {
-    if (gameState) {
-      const components = [];
-
-      const onLineClick = (
-        row: number,
-        column: number,
-        orientation: number
-      ) => {
-        fetch(`/api/game/${pid}`, {
-          method: "POST",
-          body: JSON.stringify({
-            row: row,
-            column: column,
-            orientation: orientation,
-          }),
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            setGameState(data)
-          });
-      };
-
-      for (let row = 0; row < 10; row++) {
-        for (let column = 0; column < 10; column++) {
-          const key = row * 10 + column;
-          components.push(
-            <Box key={key}>
-              <Line
-                key={`${key},1`}
-                row={row}
-                column={column}
-                orientation={1}
-                state={gameState.board.lines[`${key},1`]}
-                team={gameState.team}
-                onClick={() => onLineClick(row, column, 1)}
-              />
-              <Line
-                key={`${key},0`}
-                row={row}
-                column={column}
-                orientation={0}
-                state={gameState.board.lines[`${key},0`]}
-                team={gameState.team}
-                onClick={() => onLineClick(row, column, 0)}
-              />
-            </Box>
-          );
-        }
+    for (let row = 0; row < 10; row++) {
+      for (let column = 0; column < 10; column++) {
+        const key = row * 10 + column;
+        grid.push(
+          <Box key={key} state={gameState.board.boxes[`${key}`]}>
+            <Line
+              key={`${key},1`}
+              row={row}
+              column={column}
+              orientation={1}
+              active={gameState.status === 1}
+              state={gameState.board.lines[`${key},1`]}
+              team={gameState.team}
+              onClick={() => onLineClick(row, column, 1)}
+            />
+            <Line
+              key={`${key},0`}
+              row={row}
+              column={column}
+              orientation={0}
+              active={gameState.status === 1}
+              state={gameState.board.lines[`${key},0`]}
+              team={gameState.team}
+              onClick={() => onLineClick(row, column, 0)}
+            />
+          </Box>
+        );
       }
-      setGrid(components);
     }
-  }, [gameState]);
+  }
 
   if (grid.length == 0)
     return (
@@ -113,15 +110,19 @@ const Game: NextPage = (props: any) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className={styles.containerRectangle}>
-        <h1 className={styles.header}>
-          <span>Border</span> Patrol
-        </h1>
-        <div className={styles.gridContainer}>{grid}</div>
+        <div className={styles.containerSide}>
+          <h1 className={styles.header}>
+            <span>Border</span> Patrol
+          </h1>
+          <h4>Points: {gameState?.points}</h4>
+          <h4>
+            {msgMappings[gameState!.status]} {".".repeat(check % 3)}
+          </h4>
+        </div>
+
+        <div className={styles.containerGrid}>{grid}</div>
       </div>
     </div>
   );
 };
-
-
-
 export default Game;

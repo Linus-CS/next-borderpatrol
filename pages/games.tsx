@@ -6,12 +6,19 @@ import styles from "../styles/Home.module.css";
 
 const Party: NextPage = () => {
   const [games, setGames] = useState([]);
+  let [check, setCheck] = useState(0);
 
   useEffect(() => {
-    fetch("/api/game")
-      .then((res) => res.json())
-      .then((data) => setGames(data.games));
-  }, []);
+    const timer = setInterval(() => {
+      fetch("/api/game")
+        .then((res) => res.json())
+        .then((data) => setGames(data.games));
+      setCheck(check + 1);
+    }, 1000);
+
+    // clearing interval when component unmounts
+    return () => clearInterval(timer);
+  }, [check]);
 
   return (
     <div className={styles.container}>

@@ -40,7 +40,7 @@ export default async function handler(
 async function createGame(id: string, creatorID: string) {
   const game: Game = {
     id: id,
-    creator: { id: creatorID, points: 0, team: Team.CREATOR, status: Status.WAITING },
+    creator: { id: creatorID, points: 0, team: Team.CREATOR, status: Status.WAITING, update: true },
     board: new Board(),
   };
   await addGame(game);

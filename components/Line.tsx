@@ -2,21 +2,25 @@ import { useState } from "react";
 import styles from "../styles/Home.module.css";
 
 function Line(props: any) {
-  if (props.row >= 9 && props.orientation === 0 || props.column >= 9 && props.orientation === 1) return <></>;
   const [tempState, setTempState] = useState(0);
+  if (
+    (props.row >= 9 && props.orientation === 0) ||
+    (props.column >= 9 && props.orientation === 1)
+  )
+    return <></>;
+  if (props.state !== 0 && props.state !== tempState) setTempState(props.state);
 
   let color;
-  console.log(props.state)
-  if (props.state === 0 && tempState === 0) {
+  if (tempState === 0) {
     color = "rgba(156, 156, 156, 0.473)";
-  } else if (props.state === 1 || tempState === 1) {
+  } else if (tempState === 1) {
     color = "rgba(16, 113, 210, 0.605)";
   } else {
     color = "rgba(210, 16, 16, 0.605)";
   }
 
   function click() {
-    if (props.state === 0) {
+    if (props.state === 0 && props.active) {
       setTempState(props.team);
       props.onClick();
     }
