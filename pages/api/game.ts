@@ -12,8 +12,8 @@ export const config = {
 
 export enum Status {
   ERROR = 0,
-  WAITING = 1,
-  RUNNING = 2,
+  TURN = 1,
+  WAITING = 2,
   PENDING = 3,
 }
 
@@ -21,7 +21,6 @@ export interface Game {
   id: string;
   creator: Player;
   challenger?: Player;
-  status: Status;
   board: Board;
 }
 
@@ -41,6 +40,7 @@ export class Board {
 
 export interface Player {
   id: string;
+  status: Status
   points: number;
   team: Team;
 }
@@ -65,9 +65,7 @@ export async function addGame(game: Game) {
 }
 
 export async function replaceGame(game: Game) {
-  let games = await getAsync("games");
-  if (games === null) return -1;
-  if (!games.includes(game.id)) return -1;
+  if (!(await getAsync(`game${game.id}`))) return -1;
   await setAsync(`game${game.id}`, game);
 }
 

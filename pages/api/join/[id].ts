@@ -13,14 +13,13 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseData>
 ) {
-  // Init vars
-  const { id } = req.query;
+  const id = req.query["id"] as string;
   const cookies = new Cookies(req, res);
 
-  const game: Game | null = await findGame(id as string);
+  const game: Game | null = await findGame(id);
   if (!game) {
-    res.json({ msg: "Game does not exist." });
-  } else if (game.status == Status.WAITING) {
+    return res.json({ msg: "Game does not exist." });
+  } else if (!game.challenger) {
     const uuid = randomUUID();
     await joinGame(game, uuid);
     cookies.set(`game${id}_uuid_join`, uuid);
@@ -28,12 +27,14 @@ export default async function handler(
       Location: `/game/${id}`,
     });
     res.end();
+  } else {
+    return res.json({ msg: "Stop that!" });
   }
 }
 
 async function joinGame(game: Game, challengerID: string) {
-  game.challenger = { id: challengerID, points: 0, team: Team.CHALLENGER };
-  game.status = Status.RUNNING;
+  game.challenger = { id: challengerID, points: 0, team: Team.CHALLENGER, status: Status.PENDING };
+  game.creator.status = Status.TURN;
   const games = await getAsync("games");
   const index = games.indexOf(game.id);
   if (index !== -1) games.splice(index, 1);

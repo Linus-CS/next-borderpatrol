@@ -23,14 +23,12 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<RegularRespone | IrregularRespone>
 ) {
-  // Init vars
   const id = req.query["id"] as string;
   const game: Game | null = await findGame(id);
   if (game === null)
     return res.json({
       msg: "This game does not exist!",
     });
-
   let player: Player | null = determinePlayer(req, res, game, id);
   if (player === null)
     return res.json({
@@ -38,14 +36,24 @@ export default async function handler(
     });
 
   const data = req.body != "" ? JSON.parse(req.body) : null;
-  if (data) await handleData(data, game, player);
+  let result;
+  if (data)
+    result = await handleData(data, game, player);
 
-  res.json({
-    msg: "Great!",
-    status: Status.RUNNING,
-    team: player.team,
-    board: game.board,
-  });
+  if (result)
+    res.json({
+      msg: "Successfully set line!",
+      status: Status.PENDING,
+      team: player.team,
+      board: game.board,
+    });
+  else
+    res.json({
+      msg: "Here is your data.",
+      status: player.status,
+      team: player.team,
+      board: game.board,
+    });
 }
 
 async function handleData(
@@ -53,10 +61,12 @@ async function handleData(
   game: Game,
   player: Player
 ) {
-  console.log(data);
-  game.board.lines[`${data.row * 10 + data.column},${data.orientation}`] =
-    player.team;
-  await replaceGame(game);
+  if (player.status === Status.TURN && game.board.lines[`${data.row * 10 + data.column},${data.orientation}`] === 0) {
+    game.board.lines[`${data.row * 10 + data.column},${data.orientation}`] = player.team;
+    await replaceGame(game);
+    return true;
+  }
+  return false;
 }
 
 function determinePlayer(

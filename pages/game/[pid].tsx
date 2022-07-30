@@ -14,16 +14,32 @@ const Game: NextPage = (props: any) => {
   const [gameState, setGameState] = useState<RegularRespone | null>(null);
   const [grid, setGrid] = useState<any[]>([]);
 
-  console.log(gameState);
+  function requestGameState() {
+    fetch(`/api/game/${pid}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if ("status" in data && JSON.stringify(data) !== JSON.stringify(gameState)) {
+          setGameState(data);
+          console.log(gameState);
+        }
+      });
+  }
 
   useEffect(() => {
-    if (pid)
-      fetch(`/api/game/${pid}`)
-        .then((res) => res.json())
-        .then((data) => {
-          if ("status" in data) setGameState(data);
-        });
-  }, [pid]);
+    if (pid) requestGameState();
+  }, [pid])
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      if (pid && (gameState?.status === 2 || gameState?.status === 3)) {
+        requestGameState();
+      }
+    }, 1000);
+
+    // clearing interval when component unmounts
+    return () => clearInterval(timer);
+  }, []);
+
 
   useEffect(() => {
     if (gameState) {
@@ -43,7 +59,9 @@ const Game: NextPage = (props: any) => {
           }),
         })
           .then((res) => res.json())
-          .then((data) => setGameState(data));
+          .then((data) => {
+            setGameState(data)
+          });
       };
 
       for (let row = 0; row < 10; row++) {
@@ -94,7 +112,7 @@ const Game: NextPage = (props: any) => {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className={styles.main}>
+      <div className={styles.containerRectangle}>
         <h1 className={styles.header}>
           <span>Border</span> Patrol
         </h1>
@@ -103,5 +121,7 @@ const Game: NextPage = (props: any) => {
     </div>
   );
 };
+
+
 
 export default Game;

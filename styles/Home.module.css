@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Righteous&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Righteous&display=swap");
 
 .container {
   padding: 0 2rem;
@@ -115,6 +115,11 @@
   border: 1px solid black;
 }
 
+.containerRectangle {
+  display: inline-flex;
+  margin-top: 2vw;
+}
+
 .game * {
   display: inline;
   margin: 1rem;
@@ -133,38 +138,39 @@
   border-color: #0070f3;
 }
 
-.gridContainer{ 
+.gridContainer {
   display: grid;
   grid-template-columns: auto auto auto auto auto auto auto auto auto auto;
-  grid-template-rows: auto auto auto auto auto auto auto auto auto auto ;
+  grid-template-rows: auto auto auto auto auto auto auto auto auto auto;
   aspect-ratio: 1/1;
   height: max(90vh, 10rem);
   border: 2px solid rgba(0, 0, 0, 0.64);
   border-radius: 2%;
 }
 
-.box{
+.box {
   position: relative;
   width: 100%;
   height: 100%;
   display: flex;
 }
 
-.line{
+.line {
   position: absolute;
   display: flex;
 }
 
-.line:hover div{
+.line:hover div {
   border: 1px solid black;
 }
 
-.header{
-  text-align: center;
-  font-size: 3vw;
+.header {
+  font-size: 2.5vw;
+  margin-top: 0;
+  margin-right: 15rem;
 }
 
-.header span{
+.header span {
   color: #0070f3;
 }
 
