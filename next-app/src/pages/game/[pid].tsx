@@ -99,6 +99,14 @@ const Game: NextPage = (props: any) => {
       </div>
     );
 
+  if (gameState && gameState.winner !== undefined) {
+    if (gameState.team == gameState.winner)
+      return <div className={styles.main}>You won!</div>;
+    if (gameState.winner === 3) return <div className={styles.main}>Draw!</div>;
+    if (gameState.team != gameState.winner)
+      return <div className={styles.main}>You lost!</div>;
+  }
+
   return (
     <div className={styles.container}>
       <Head>

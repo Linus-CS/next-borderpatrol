@@ -1,11 +1,7 @@
 import { createClient } from "redis";
 
 export async function getClient() {
-  const client = createClient({
-    socket: {
-      host: "redis",
-    }
-  });
+  const client = createClient();
 
   client.on("error", (err) => {
     console.log("Redis Error: ", err);
@@ -20,8 +16,9 @@ export async function connectDB(client) {
   await client.connect();
 }
 
-export async function setAsync(client, key: string, value: any) {
+export async function setAsync(client, key: string, value: any, expire?: number) {
   await client.set(key, JSON.stringify(value));
+  if (expire) await client.expire(key, expire);
   return true;
 }
 

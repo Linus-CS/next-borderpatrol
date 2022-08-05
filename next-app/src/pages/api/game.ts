@@ -22,6 +22,7 @@ export interface Game {
   creator: Player;
   challenger?: Player;
   board: Board;
+  winner?: number;
 }
 
 export class Board {
@@ -33,8 +34,8 @@ export class Board {
     for (let r = 0; r < 10; r++) {
       for (let c = 0; c < 10; c++) {
         b.set(`${r * 10 + c}`, 0)
-        l.set(`${r * 10 + c},0`, 0);
-        l.set(`${r * 10 + c},1`, 0);
+        l.set(`${r * 10 + c},0`, r >= 9 ? 3 : 0);
+        l.set(`${r * 10 + c},1`, c >= 9 ? 3 : 0);
       }
     }
     this.lines = Object.fromEntries(l);
@@ -67,13 +68,13 @@ export async function addGame(client, game: Game) {
   let games = await getAsync(client, "games");
   if (games === null) games = [];
   if (!games.includes(game.id)) games.push(game.id);
-  await setAsync(client, `game${game.id}`, game);
+  await setAsync(client, `game${game.id}`, game, 1000);
   await setAsync(client, "games", games);
 }
 
 export async function replaceGame(client, game: Game) {
   if (!(await getAsync(client, `game${game.id}`))) return -1;
-  await setAsync(client, `game${game.id}`, game);
+  await setAsync(client, `game${game.id}`, game, 1000);
 }
 
 export async function findGame(client, id: string) {

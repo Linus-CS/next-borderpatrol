@@ -22,6 +22,8 @@ export default async function handler(
   res: NextApiResponse<ResponseData>
 ) {
   const client = await getClient();
+  let games = await getAsync(client, "games");
+  if (games !== null && games.length >= 30) return res.json({ msg: "Wait till you create your game ok." });
   let gameID = await getAsync(client, "gameID");
   if (gameID == null) gameID = 0;
 

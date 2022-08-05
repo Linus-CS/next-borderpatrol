@@ -15,6 +15,7 @@ export type RegularRespone = {
   points: number;
   team: Team;
   board: Board;
+  winner?: number;
 };
 
 type IrregularRespone = {
@@ -45,10 +46,10 @@ export default async function handler(
 
   if (data.msg === "set") {
     await handleData(data, game, player, opponent);
-    respond(res, player, game.board, "Here you go, have some data!");
+    respond(res, player, game.board, "Here you go, have some data!", game.winner);
   } else if (data.msg == "retrieve" || player.update) {
     player.update = false;
-    respond(res, player, game.board, player.status === Status.TURN ? "Your turn!" : "Here you go, have some data!");
+    respond(res, player, game.board, player.status === Status.TURN ? "Your turn!" : "Here you go, have some data!", game.winner);
   } else {
     res.json({ msg: "pong!" })
   }
@@ -74,6 +75,12 @@ async function handleData(
       player.status = Status.PENDING;
       opponent.status = Status.TURN;
     }
+    if (player.points >= 50 && opponent.points < 50)
+      game.winner = player.team;
+    if (opponent.points >= 50 && player.points < 50)
+      game.winner = opponent.team;
+    if (player.points == 50 && opponent.points == 50)
+      game.winner = 3;
     player.update = false;
     opponent.update = true;
   }
@@ -92,13 +99,14 @@ function determinePlayer(
   return [null, null];
 }
 
-function respond(res: NextApiResponse<RegularRespone>, player: Player, board: Board, msg: string) {
+function respond(res: NextApiResponse<RegularRespone>, player: Player, board: Board, msg: string, winner?: Team) {
   res.json({
     msg: msg,
     status: player.status,
     points: player.points,
     team: player.team,
     board: board,
+    winner: winner
   });
 }
 
@@ -135,6 +143,7 @@ function checkBoxes(data: any, lines: any, boxes: any, player: Player) {
 function checkBox(matrix: any[], lines: any, row: any, column: any) {
   for (let i = 0; i < 3; i++) {
     const M = matrix[i];
+    console.log(lines[utilLine(row + M[0], column + M[1], M[2])]);
     if (lines[utilLine(row + M[0], column + M[1], M[2])] === 0) return false;
   }
   return true;
