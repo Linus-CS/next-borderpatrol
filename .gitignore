@@ -18,7 +18,9 @@
 # misc
 .DS_Store
 *.pem
-/https_cert
+*.ca-bundle
+*.crt
+*.key
 
 # debug
 npm-debug.log*

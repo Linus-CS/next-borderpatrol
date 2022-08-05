@@ -12,6 +12,7 @@ services:
     restart: always
     ports:
       - 443:3000
+      - 80:3000
     networks:
       - my_network
 
