@@ -69,7 +69,7 @@ export async function addGame(client, game: Game) {
   if (games === null) games = [];
   if (!games.includes(game.id)) games.push(game.id);
   await setAsync(client, `game${game.id}`, game, 1000);
-  await setAsync(client, "games", games);
+  await setAsync(client, "games", games, 3600);
 }
 
 export async function replaceGame(client, game: Game) {
