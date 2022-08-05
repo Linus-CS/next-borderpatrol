@@ -15,6 +15,7 @@ COPY src ./src
 COPY public ./public
 COPY next.config.js .
 COPY tsconfig.json .
+COPY server.js .
 
 # Environment variables must be present at build time
 # https://github.com/vercel/next.js/discussions/14030
