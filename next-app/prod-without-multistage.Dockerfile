@@ -16,7 +16,7 @@ COPY public ./public
 COPY next.config.js .
 COPY tsconfig.json .
 COPY server.js .
-COPY https_cert /https_cert
+COPY https_cert ./https_cert
 
 # Environment variables must be present at build time
 # https://github.com/vercel/next.js/discussions/14030
