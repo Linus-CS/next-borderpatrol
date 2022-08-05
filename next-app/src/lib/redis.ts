@@ -1,7 +1,9 @@
 import { createClient } from "redis";
 
 export async function getClient() {
-  const client = createClient();
+  const client = createClient({
+    socket: { host: "redis" }
+  });
 
   client.on("error", (err) => {
     console.log("Redis Error: ", err);
