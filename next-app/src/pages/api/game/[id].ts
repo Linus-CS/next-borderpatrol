@@ -143,7 +143,6 @@ function checkBoxes(data: any, lines: any, boxes: any, player: Player) {
 function checkBox(matrix: any[], lines: any, row: any, column: any) {
   for (let i = 0; i < 3; i++) {
     const M = matrix[i];
-    console.log(lines[utilLine(row + M[0], column + M[1], M[2])]);
     if (lines[utilLine(row + M[0], column + M[1], M[2])] === 0) return false;
   }
   return true;
