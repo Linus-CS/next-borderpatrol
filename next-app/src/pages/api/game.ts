@@ -23,6 +23,7 @@ export interface Game {
   challenger?: Player;
   board: Board;
   winner?: number;
+  lastLine?: any;
 }
 
 export class Board {

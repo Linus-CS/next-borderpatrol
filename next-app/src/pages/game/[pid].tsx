@@ -61,9 +61,11 @@ const Game: NextPage = (props: any) => {
       });
     };
 
+    const lastL = gameState.lastLine;
     for (let row = 0; row < 10; row++) {
       for (let column = 0; column < 10; column++) {
         const key = row * 10 + column;
+        const last = lastL && lastL.row == row && lastL.column == column;
         grid.push(
           <Box key={key} state={gameState.board.boxes[`${key}`]}>
             <Line
@@ -74,6 +76,7 @@ const Game: NextPage = (props: any) => {
               active={gameState.status === 1}
               state={gameState.board.lines[`${key},1`]}
               team={gameState.team}
+              last={last && lastL.orientation == 1}
               onClick={() => onLineClick(row, column, 1)}
             />
             <Line
@@ -84,6 +87,7 @@ const Game: NextPage = (props: any) => {
               active={gameState.status === 1}
               state={gameState.board.lines[`${key},0`]}
               team={gameState.team}
+              last={last && lastL.orientation == 0}
               onClick={() => onLineClick(row, column, 0)}
             />
           </Box>

@@ -12,11 +12,15 @@ function Line(props: any) {
 
   let color;
   if (tempState === 0) {
-    color = "rgba(156, 156, 156, 0.473)";
+    color = "rgba(156, 156, 156, 0.200)";
   } else if (tempState === 1) {
     color = "rgba(16, 113, 210, 0.605)";
   } else {
     color = "rgba(210, 16, 16, 0.605)";
+  }
+
+  if (props.last) {
+    color = "rgb(102, 255, 51)";
   }
 
   function click() {

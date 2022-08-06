@@ -16,6 +16,7 @@ export type RegularRespone = {
   team: Team;
   board: Board;
   winner?: number;
+  lastLine?: any;
 };
 
 type IrregularRespone = {
@@ -49,7 +50,7 @@ export default async function handler(
     respond(res, player, game.board, "Here you go, have some data!", game.winner);
   } else if (data.msg == "retrieve" || player.update) {
     player.update = false;
-    respond(res, player, game.board, player.status === Status.TURN ? "Your turn!" : "Here you go, have some data!", game.winner);
+    respond(res, player, game.board, player.status === Status.TURN ? "Your turn!" : "Here you go, have some data!", game.winner, game.lastLine);
   } else {
     res.json({ msg: "pong!" })
   }
@@ -74,10 +75,11 @@ async function handleData(
     if (!checkBoxes(data, game.board.lines, game.board.boxes, player)) {
       player.status = Status.PENDING;
       opponent.status = Status.TURN;
+      game.lastLine = data;
     }
-    if (player.points >= 50 && opponent.points < 50)
+    if (player.points > 50 && game.winner === undefined)
       game.winner = player.team;
-    if (opponent.points >= 50 && player.points < 50)
+    if (opponent.points > 50 && game.winner === undefined)
       game.winner = opponent.team;
     if (player.points == 50 && opponent.points == 50)
       game.winner = 3;
@@ -99,14 +101,15 @@ function determinePlayer(
   return [null, null];
 }
 
-function respond(res: NextApiResponse<RegularRespone>, player: Player, board: Board, msg: string, winner?: Team) {
+function respond(res: NextApiResponse<RegularRespone>, player: Player, board: Board, msg: string, winner?: Team, lastLine?: any) {
   res.json({
     msg: msg,
     status: player.status,
     points: player.points,
     team: player.team,
     board: board,
-    winner: winner
+    winner: winner,
+    lastLine: lastLine
   });
 }
 
